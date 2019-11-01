@@ -22,7 +22,7 @@ public class GenerateLevel {
     }
     
     public static void main(String[] args) {
-	MarioLevelGenerator generator = new levelGenerators.sampler.LevelGenerator("levels/hopper", 20);
+	MarioLevelGenerator generator = new levelGenerators.AponteTrautzGenerator.LevelGenerator();
 	String level = generator.getGeneratedLevel(new MarioLevelModel(600, 16), new MarioTimer(5*60*60*1000));
 	MarioGame game = new MarioGame();
 	// printResults(game.playGame(level, 200, 0));
