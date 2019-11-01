@@ -4,6 +4,8 @@ import engine.core.MarioLevelModel;
 import engine.core.MarioResult;
 import engine.core.MarioTimer;
 
+import java.io.IOException;
+
 public class GenerateLevel {
     public static void printResults(MarioResult result) {
 	System.out.println("****************************************************************");
@@ -21,7 +23,7 @@ public class GenerateLevel {
 	System.out.println("****************************************************************");
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 	MarioLevelGenerator generator = new levelGenerators.AponteTrautzGenerator.LevelGenerator();
 	String level = generator.getGeneratedLevel(new MarioLevelModel(600, 16), new MarioTimer(5*60*60*1000));
 	MarioGame game = new MarioGame();

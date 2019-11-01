@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class LevelGenerator implements MarioLevelGenerator{
     private Random rnd;
-    private int sampleWidth = 10;
+    private int sampleWidth = 30;
     private String folderName = "levels/original/";
     private final int GROUND_Y_LOCATION = 13;
     private final float GROUND_PROB = 0.4f;
@@ -24,18 +24,16 @@ public class LevelGenerator implements MarioLevelGenerator{
     private final float ENMEY_PROB = 0.1f;
     private final int FLOOR_PADDING = 3;
 
-    public LevelGenerator(){
-        this("levels/original/", 10);
-    }
+    public LevelGenerator(){}
 
-    public LevelGenerator(String sampleFolder) {
-        this(sampleFolder, 10);
-    }
-
-    public LevelGenerator(String sampleFolder, int sampleWidth) {
-        this.sampleWidth = sampleWidth;
-        this.folderName = sampleFolder;
-    }
+//    public LevelGenerator(String sampleFolder) {
+//        this(sampleFolder, 10);
+//    }
+//
+//    public LevelGenerator(String sampleFolder, int sampleWidth) {
+//        this.sampleWidth = sampleWidth;
+//        this.folderName = sampleFolder;
+//    }
 
     //Frequency table
     Map<String, Integer> freq = new HashMap<String, Integer>() {
@@ -45,9 +43,9 @@ public class LevelGenerator implements MarioLevelGenerator{
         }
     };
 
-    private String getRandomLevel() throws IOException {
+    private String getLevel(int lvl) throws IOException {
         File[] listOfFiles = new File(folderName).listFiles();
-        List<String> lines = Files.readAllLines(listOfFiles[rnd.nextInt(listOfFiles.length)].toPath());
+        List<String> lines = Files.readAllLines(listOfFiles[lvl].toPath());
         String result = "";
         for(int i=0; i<lines.size(); i++) {
             result += lines.get(i) + "\n";
@@ -55,7 +53,8 @@ public class LevelGenerator implements MarioLevelGenerator{
         return result;
     }
 
-    public void runMarkov(){
+    public int [] runMarkov() throws IOException{
+        int [] output = new int[999];
         // the state transition matrix
         double[][] transition = { { 0.386, 0.147, 0.202, 0.062, 0.140, 0.047, 0.016},
                 { 0.107, 0.267, 0.227, 0.120, 0.207, 0.052, 0.020},
@@ -72,11 +71,12 @@ public class LevelGenerator implements MarioLevelGenerator{
 
         // run Markov chain
         while (state > 0) {
-            // System.out.println(state);
+
+            output[transitionCount] = state;
             transitionCount++;
+
             double r = Math.random();
             double sum = 0.0;
-
             // determine next state
             for (int j = 0; j < N; j++) {
                 sum += transition[state][j];
@@ -86,13 +86,16 @@ public class LevelGenerator implements MarioLevelGenerator{
                 }
             }
         }
+        return output;
     }
-    public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) {
+
+    public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) throws IOException {
+        int [] order = runMarkov();
         rnd = new Random();
         model.clearMap();
         for(int i=0; i<model.getWidth() / sampleWidth; i++){
             try {
-                model.copyFromString(i*sampleWidth, 0, i*sampleWidth, 0, sampleWidth, model.getHeight(), this.getRandomLevel());
+                model.copyFromString(i*sampleWidth, 0, i*sampleWidth, 0, sampleWidth, model.getHeight(), getLevel(order[i]));
             } catch (IOException e) {
                 e.printStackTrace();
             }
