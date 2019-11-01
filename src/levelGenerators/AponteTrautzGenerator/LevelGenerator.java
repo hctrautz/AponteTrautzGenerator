@@ -72,7 +72,7 @@ public class LevelGenerator implements MarioLevelGenerator{
 
         // run Markov chain
         while (state > 0) {
-           // System.out.println(state);
+            // System.out.println(state);
             transitionCount++;
             double r = Math.random();
             double sum = 0.0;
@@ -87,41 +87,16 @@ public class LevelGenerator implements MarioLevelGenerator{
             }
         }
     }
-
-    @Override
     public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) {
-
-        Random random = new Random();
+        rnd = new Random();
         model.clearMap();
-        for(int x=0; x<model.getWidth(); x++) {
-            for(int y=0; y<model.getHeight(); y++) {
-                model.setBlock(x, y, MarioLevelModel.EMPTY);
-                if(y > GROUND_Y_LOCATION) {
-                    if(random.nextDouble() < GROUND_PROB) {
-                        model.setBlock(x, y, MarioLevelModel.GROUND);
-                    }
-                }
-                else if(y > OBSTACLES_LOCATION){
-                    if(random.nextDouble() < OBSTACLES_PROB) {
-                        model.setBlock(x, y, MarioLevelModel.PYRAMID_BLOCK);
-                    }
-                    else if(random.nextDouble() < ENMEY_PROB) {
-                        model.setBlock(x, y,
-                                MarioLevelModel.getEnemyCharacters()[random.nextInt(MarioLevelModel.getEnemyCharacters().length)]);
-                    }
-                }
-                else if(y > COLLECTIBLE_LOCATION) {
-                    if(random.nextDouble() < COLLECTIBLE_PROB) {
-                        model.setBlock(x, y,
-                                MarioLevelModel.getCollectablesTiles()[random.nextInt(MarioLevelModel.getCollectablesTiles().length)]);
-                    }
-                }
+        for(int i=0; i<model.getWidth() / sampleWidth; i++){
+            try {
+                model.copyFromString(i*sampleWidth, 0, i*sampleWidth, 0, sampleWidth, model.getHeight(), this.getRandomLevel());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        model.setRectangle(0, 14, FLOOR_PADDING, 2, MarioLevelModel.GROUND);
-        model.setRectangle(model.getWidth() - 1 - FLOOR_PADDING, 14, FLOOR_PADDING, 2, MarioLevelModel.GROUND);
-        model.setBlock(FLOOR_PADDING/2, 13, MarioLevelModel.MARIO_START);
-        model.setBlock(model.getWidth() - 1 - FLOOR_PADDING/2, 13, MarioLevelModel.MARIO_EXIT);
         return model.getMap();
     }
 
