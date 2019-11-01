@@ -199,7 +199,8 @@ public class MarioGame{
 	    this.render = new MarioRender(scale);
 	    this.window.setContentPane(this.render);
 	    this.window.pack();
-	    this.window.setResizable(false);
+		this.window.setLocationRelativeTo(null);
+		this.window.setResizable(false);
 	    this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    this.render.init();
 	    this.window.setVisible(true);

@@ -29,7 +29,6 @@ public class LevelGenerator implements MarioLevelGenerator{
     @Override
     public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) {
 
-
         // the state transition matrix
         double[][] transition = { { 0.386, 0.147, 0.202, 0.062, 0.140, 0.047, 0.016},
                 { 0.107, 0.267, 0.227, 0.120, 0.207, 0.052, 0.020},
