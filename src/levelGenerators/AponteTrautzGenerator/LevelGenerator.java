@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class LevelGenerator implements MarioLevelGenerator{
     int [] order = runMarkov();
-    private int sampleWidth = 20;
+    private int sampleWidth = 5;
     private String folderName = "levels/original/";
     private final int GROUND_Y_LOCATION = 13;
     private final float GROUND_PROB = 0.4f;
@@ -35,26 +35,30 @@ public class LevelGenerator implements MarioLevelGenerator{
         return result;
     }
 
+
+
+
+
     public int [] runMarkov() throws IOException{
         int [] output = new int[999];
         // the state transition matrix
         //TODO: add new values to calculate regarding the probability of state transitions
         double[][] transition = {
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.00, 0.03, 0.05, 0.08, 0.11, 0.14, 0.17, .2, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00},
         };
 
         int N = 15; // number of states
@@ -64,6 +68,7 @@ public class LevelGenerator implements MarioLevelGenerator{
         // run Markov chain
         while (state > 0) {
 
+            System.out.println("State: " + state);
             output[transitionCount] = state;
             transitionCount++;
 
@@ -99,12 +104,11 @@ public class LevelGenerator implements MarioLevelGenerator{
                         lvlLength ++;
                     }
                 }
-                System.out.println("State: " + order[i]);
 
                 MarioLevelModel newGen = new MarioLevelModel(lvlLength,16);
                 newGen.copyFromString(lvl);
                 int [] flag = newGen.findEndOfLevel();
-                System.out.println("X: " + flag[0] + " Y: " + flag[1]);
+                //System.out.println("X: " + flag[0] + " Y: " + flag[1]);
 
                 //TODO: Only copy the lines of code from the level that will match up with what we already have
                 //TODO: Only copy last lines of code from a level when generating the new last lines. i.e flag should always and only be at the end.
@@ -114,8 +118,8 @@ public class LevelGenerator implements MarioLevelGenerator{
                 if(i+1 == model.getWidth()/sampleWidth){
                     //System.out.println("\n Last State! \n" + "State #: " + order[i] + "\n");
                     //System.out.println(newGen.getWidth());
-                    model.copyFromString(i*sampleWidth, 0, flag[0], flag[1], sampleWidth, newGen.getHeight(), lvl);
-                    //System.out.print(i);
+                    model.copyFromString(i*sampleWidth, 0, newGen.getWidth()-sampleWidth, 0,  sampleWidth, newGen.getHeight(), lvl);
+                    System.out.print("Index: " + i + "\n");
                 } else {
                     model.copyFromString(i*sampleWidth, 0, i*sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
                     oldGen = model.clone(); //saves a copy of the model
