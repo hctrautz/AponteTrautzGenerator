@@ -111,7 +111,6 @@ public class LevelGenerator implements MarioLevelGenerator{
                 //System.out.println("X: " + flag[0] + " Y: " + flag[1]);
 
                 //TODO: Only copy the lines of code from the level that will match up with what we already have
-                //TODO: Only copy last lines of code from a level when generating the new last lines. i.e flag should always and only be at the end.
 
                 //needs if statements that compare old model to new model to see if it is okay to continue
                 //oldGen.getBlock(oldGen.getWidth(), 4) == 'F'
