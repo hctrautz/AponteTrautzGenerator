@@ -20,7 +20,6 @@ public class LevelGenerator implements MarioLevelGenerator{
     private String getLevel(int lvl) throws IOException {
         File[] listOfFiles = new File(folderName).listFiles();
         List<String> lines = Files.readAllLines(listOfFiles[lvl].toPath());
-        System.out.print(lvl + "  ");
         String result = "";
         for(int i=0; i<lines.size(); i++) {
             result += lines.get(i) + "\n";
@@ -50,6 +49,8 @@ public class LevelGenerator implements MarioLevelGenerator{
                 {0.046, 0.036, 0.072, 0.116, 0.023, 0.004, 0.091, 0.013, 0.086, 0.177, 0.062, 0.010, 0.123, 0.017, 0.124},
         };
 
+
+        //The following code is inspired from https://introcs.cs.princeton.edu/java/98simulation/MarkovChain.java.html
         // Total # of States
         int N = 15;
         //Current state
@@ -59,13 +60,11 @@ public class LevelGenerator implements MarioLevelGenerator{
 
         // run Markov chain
         for (int i = 0; i < N+1; i++) {
-
-            System.out.println("State: " + state);
             output[transitionCount] = state;
             transitionCount++;
 
             double r = Math.random();
-            System.out.print(r);
+            //System.out.print(r);
             double sum = 0.0;
             // determine next state
             for (int j = 0; j < N; j++) {
@@ -101,36 +100,29 @@ public class LevelGenerator implements MarioLevelGenerator{
                 //Create a model from the current level in the markov chain, so that we can compare it to what we already have created from the generated level
                 MarioLevelModel newGen = new MarioLevelModel(lvlLength,16);
                 newGen.copyFromString(lvl);
-                //System.out.println("X: " + flag[0] + " Y: " + flag[1]);
 
-                //TODO: Only copy the lines of code from the level that will match up with what we already have
                 //On the last iteration of the loop, copy the last 5 lines of the level that was selected by the markov chain. This ensures that every level we generate has a flag at the end.
                 if(i+1 == model.getWidth()/sampleWidth){
-                    //System.out.println("\n Last State! \n" + "State #: " + order[i] + "\n");
-                    //System.out.println(newGen.getWidth());
                     model.copyFromString(i*sampleWidth, 0, newGen.getWidth()-sampleWidth, 0,  sampleWidth, newGen.getHeight(), lvl);
-                    System.out.print("Index: " + i + "\n");
                 } else {
-                    //If there exists a gap that is 4 blocks long at the end of our current model, do not copy a gap from the new level.
+                    //If there exists a gap made from Mushrooms that is 4 blocks long in the chunk we are about to copy, then chose another chunk from earlier in the level
                     if((newGen.getBlock((i * sampleWidth), 16) == '|' && newGen.getBlock((i * sampleWidth)+1, 16) == '|') && (newGen.getBlock((i * sampleWidth)+2, 16) == '|' && newGen.getBlock((i * sampleWidth)+3, 16) == '|') && newGen.getBlock((i * sampleWidth)+4, 16) == '|'){
-                        System.out.println("Big Shroom!");
                         model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)/5, 0, sampleWidth, model.getHeight(), lvl);
                     }
-
+                    //Prevents pipes from being placed at the start of a chunk
                     if((newGen.getBlock((i * sampleWidth), 3) == 'T' || newGen.getBlock((i * sampleWidth), 4) == '|')){
-                        System.out.println("Big Pipe!");
                         model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)-1, 0, sampleWidth, model.getHeight(), lvl);
                     }
 
+                    //Looks through the chunk we are about to copy, if there is a flag then chose another chunk from earlier in the level
                     for (int k = 0; k < sampleWidth+1; k++){
                         if(newGen.getBlock((i * sampleWidth)+k, 14) == 'F' || newGen.getBlock((i * sampleWidth)+k, 13) == 'F' || newGen.getBlock((i * sampleWidth)+k, 12) == 'F' || newGen.getBlock((i * sampleWidth)+k, 11) == 'F'){
-                            System.out.println("Two Flags");
                             model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)/5, 0, sampleWidth, model.getHeight(), lvl);
                         }
                     }
 
+                    //If there is 5 block wide gap in the chunk we are about to copy, then chose another chunk from earlier in the level
                     if((newGen.getBlock((i * sampleWidth), 16) == '-' && newGen.getBlock((i * sampleWidth)+1, 16) == '-') && (newGen.getBlock((i * sampleWidth)+2, 16) == '-' && newGen.getBlock((i * sampleWidth)+3, 16) == '-') && newGen.getBlock((i * sampleWidth)+4, 16) == '-'){
-                        System.out.println("Big Gap!");
                         model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)/5, 0, sampleWidth, model.getHeight(), lvl);
                     }
 
