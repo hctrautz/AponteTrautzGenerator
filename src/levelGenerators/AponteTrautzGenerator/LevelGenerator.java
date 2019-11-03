@@ -107,7 +107,6 @@ public class LevelGenerator implements MarioLevelGenerator{
 
                 MarioLevelModel newGen = new MarioLevelModel(lvlLength,16);
                 newGen.copyFromString(lvl);
-                int [] flag = newGen.findEndOfLevel();
                 //System.out.println("X: " + flag[0] + " Y: " + flag[1]);
 
                 //TODO: Only copy the lines of code from the level that will match up with what we already have
