@@ -11,7 +11,6 @@ import java.util.Random;
 
 public class LevelGenerator implements MarioLevelGenerator{
     int [] order = runMarkov();
-    private Random rnd;
     private int sampleWidth = 20;
     private String folderName = "levels/original/";
     private final int GROUND_Y_LOCATION = 13;
@@ -83,7 +82,6 @@ public class LevelGenerator implements MarioLevelGenerator{
     }
 
     public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) throws IOException {
-        rnd = new Random();
         MarioLevelModel oldGen = new MarioLevelModel(100,100);
 
         model.clearMap();
@@ -117,11 +115,10 @@ public class LevelGenerator implements MarioLevelGenerator{
                     //System.out.println("\n Last State! \n" + "State #: " + order[i] + "\n");
                     //System.out.println(newGen.getWidth());
                     model.copyFromString(i*sampleWidth, 0, flag[0], flag[1], sampleWidth, newGen.getHeight(), lvl);
-                   // System.out.print(i);
+                    //System.out.print(i);
                 } else {
                     model.copyFromString(i*sampleWidth, 0, i*sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
                     oldGen = model.clone(); //saves a copy of the model
-                    //System.out.print(i);
                 }
 
             } catch (IOException e) {
