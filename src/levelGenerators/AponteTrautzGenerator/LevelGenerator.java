@@ -101,9 +101,12 @@ public class LevelGenerator implements MarioLevelGenerator{
                         lvlLength ++;
                     }
                 }
+                System.out.println("State: " + order[i]);
 
                 MarioLevelModel newGen = new MarioLevelModel(lvlLength,16);
                 newGen.copyFromString(lvl);
+                int [] flag = newGen.findEndOfLevel();
+                System.out.println("X: " + flag[0] + " Y: " + flag[1]);
 
                 //TODO: Only copy the lines of code from the level that will match up with what we already have
                 //TODO: Only copy last lines of code from a level when generating the new last lines. i.e flag should always and only be at the end.
@@ -111,14 +114,14 @@ public class LevelGenerator implements MarioLevelGenerator{
                 //needs if statements that compare old model to new model to see if it is okay to continue
                 //oldGen.getBlock(oldGen.getWidth(), 4) == 'F'
                 if(i+1 == model.getWidth()/sampleWidth){
-                    System.out.println("\n Last State! \n" + "State #: " + order[i] + "\n");
-                    System.out.println(newGen.getWidth());
-                    model.copyFromString(i*sampleWidth, 0, newGen.getWidth()-sampleWidth, 0, sampleWidth, newGen.getHeight(), lvl);
-                    System.out.print(i);
+                    //System.out.println("\n Last State! \n" + "State #: " + order[i] + "\n");
+                    //System.out.println(newGen.getWidth());
+                    model.copyFromString(i*sampleWidth, 0, flag[0], flag[1], sampleWidth, newGen.getHeight(), lvl);
+                   // System.out.print(i);
                 } else {
                     model.copyFromString(i*sampleWidth, 0, i*sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
                     oldGen = model.clone(); //saves a copy of the model
-                    System.out.print(i);
+                    //System.out.print(i);
                 }
 
             } catch (IOException e) {

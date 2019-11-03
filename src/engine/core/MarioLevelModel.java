@@ -297,4 +297,29 @@ public class MarioLevelModel {
 	MarioGame game = new MarioGame();
 	return game.runGame(agent, this.getMap(), timer);
     }
+
+    public int[] findEndOfLevel(){
+        int [] coords = new int[2];
+        for(int y = 0; y < this.map[0].length; y++){
+            for (int x =0; x < this.map.length; x++){
+                if(getBlock(x, y) == 'F'){
+                   coords [0] = x;
+                   coords [1] = y;
+                }
+            }
+        }
+        return coords;
+    }
+
+
+    public void copyEndOfLevel(int targetX, int targetY, int sourceX, int sourceY, int width, int height, String level) {
+        String[] lines = level.split("\n");
+        for(int y=0; y<height; y++) {
+            for(int x=0; x<width; x++) {
+                int maxWidth = lines[0].length();
+                int maxHeight = lines.length;
+                this.setBlock(x + targetX, y + targetY, lines[Math.min(y + sourceY, maxHeight - 1)].charAt(Math.min(x + sourceX, maxWidth - 1)));
+            }
+        }
+    }
 }
