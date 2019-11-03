@@ -28,6 +28,7 @@ public class LevelGenerator implements MarioLevelGenerator{
     private String getLevel(int lvl) throws IOException {
         File[] listOfFiles = new File(folderName).listFiles();
         List<String> lines = Files.readAllLines(listOfFiles[lvl].toPath());
+        System.out.print(lvl + "  ");
         String result = "";
         for(int i=0; i<lines.size(); i++) {
             result += lines.get(i) + "\n";
@@ -38,18 +39,27 @@ public class LevelGenerator implements MarioLevelGenerator{
     public int [] runMarkov() throws IOException{
         int [] output = new int[999];
         // the state transition matrix
-        //TODO: Expand to using all 15 original levels and actually calculate values regarding the probability
-        double[][] transition = { { 0.386, 0.147, 0.202, 0.062, 0.140, 0.047, 0.016},
-                { 0.107, 0.267, 0.227, 0.120, 0.207, 0.052, 0.020},
-                { 0.035, 0.101, 0.188, 0.191, 0.357, 0.067, 0.061},
-                { 0.021, 0.039, 0.112, 0.212, 0.431, 0.124, 0.061},
-                { 0.009, 0.024, 0.075, 0.123, 0.473, 0.171, 0.125},
-                { 0.000, 0.103, 0.041, 0.088, 0.391, 0.312, 0.155},
-                { 0.000, 0.008, 0.036, 0.083, 0.364, 0.235, 0.274}
+        //TODO: add new values to calculate regarding the probability of state transitions
+        double[][] transition = {
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
+                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
         };
 
-        int N = 7; // number of states
-        int state = N - 1; // current state
+        int N = 15; // number of states
+        int state = N-1; // current state
         int transitionCount = 0; // number of transitions
 
         // run Markov chain
@@ -74,11 +84,20 @@ public class LevelGenerator implements MarioLevelGenerator{
 
     public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) throws IOException {
         rnd = new Random();
+        MarioLevelModel oldGen = new MarioLevelModel(100,100);
+        MarioLevelModel newGen = new MarioLevelModel(100,100);
+
         model.clearMap();
         for(int i=0; i<model.getWidth() / sampleWidth; i++){
             try {
                 //TODO: Only copy the lines of code from the level that will match up with what we already have
+                //TODO: Only copy last lines of code from a level when generating the new last lines. i.e flag should always and only be at the end.
+                oldGen = model; //saves a copy of the model
+                //needs if statements that compare old model to new model to see if it is okay to continye
+
+
                 model.copyFromString(i*sampleWidth, 0, i*sampleWidth, 0, sampleWidth, model.getHeight(), getLevel(order[i]));
+                System.out.print(i);
             } catch (IOException e) {
                 e.printStackTrace();
             }
