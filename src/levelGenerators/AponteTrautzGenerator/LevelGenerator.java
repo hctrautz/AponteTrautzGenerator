@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class LevelGenerator implements MarioLevelGenerator{
     int [] order = runMarkov();
-    private int sampleWidth = 5;
+    private int sampleWidth = 12;
     private String folderName = "levels/original/";
     private final int GROUND_Y_LOCATION = 13;
     private final float GROUND_PROB = 0.4f;
@@ -67,7 +67,7 @@ public class LevelGenerator implements MarioLevelGenerator{
         int transitionCount = 0;
 
         // run Markov chain
-        while (state > 0) {
+        for (int i = 0; i < N; i++) {
 
             System.out.println("State: " + state);
             output[transitionCount] = state;
@@ -119,10 +119,12 @@ public class LevelGenerator implements MarioLevelGenerator{
                     model.copyFromString(i*sampleWidth, 0, newGen.getWidth()-sampleWidth, 0,  sampleWidth, newGen.getHeight(), lvl);
                     System.out.print("Index: " + i + "\n");
                 } else {
-                    if(model.getBlock(i * sampleWidth, 0) == newGen.getBlock(i*sampleWidth, 0)) {
-                        model.copyFromString(i * sampleWidth, 0, i * sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
+                    //If there exists a gap that is 4 blocks long at the end of our current model, do not copy a gap from the new level.
+                    if((model.getBlock(i * sampleWidth, 16) == '-' && newGen.getBlock(i*sampleWidth, 16) == '-') && (model.getBlock((i * sampleWidth) +1, 16) == '-' && newGen.getBlock((i*sampleWidth)+1, 16) == '-') &&
+                            (model.getBlock((i * sampleWidth) +2, 16) == '-' && newGen.getBlock((i*sampleWidth)+2, 16) == '-') && (model.getBlock((i * sampleWidth) +3, 16) == '-' && newGen.getBlock((i*sampleWidth)+3, 16) == '-')){
+                        model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)+3, 0, sampleWidth, model.getHeight(), lvl);
                     } else {
-                        System.out.println("Skipped!");
+                        model.copyFromString(i * sampleWidth, 0, i * sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
                     }
                 }
             } catch (IOException e) {
