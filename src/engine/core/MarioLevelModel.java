@@ -161,6 +161,8 @@ public class MarioLevelModel {
     public MarioLevelModel(int levelWidth, int levelHeight) {
 	this.map = new char[levelWidth][levelHeight];
     }
+
+    public MarioLevelModel() {}
     
     /**
      * create a similar clone to the current map
