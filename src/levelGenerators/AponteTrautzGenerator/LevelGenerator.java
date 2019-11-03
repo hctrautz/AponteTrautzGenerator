@@ -11,8 +11,8 @@ import java.util.Random;
 
 public class LevelGenerator implements MarioLevelGenerator{
     int [] order = runMarkov();
-    private int sampleWidth = 15;
-    private String folderName = "levels/original/";
+    private int sampleWidth = 11;
+    private String folderName = "levels/aponteTrautz/";
     private final int GROUND_Y_LOCATION = 13;
     private final float GROUND_PROB = 0.4f;
     private final int OBSTACLES_LOCATION = 10;
@@ -120,23 +120,28 @@ public class LevelGenerator implements MarioLevelGenerator{
                     System.out.print("Index: " + i + "\n");
                 } else {
                     //If there exists a gap that is 4 blocks long at the end of our current model, do not copy a gap from the new level.
+                    if((newGen.getBlock((i * sampleWidth), 16) == '|' && newGen.getBlock((i * sampleWidth)+1, 16) == '|') && (newGen.getBlock((i * sampleWidth)+2, 16) == '|' && newGen.getBlock((i * sampleWidth)+3, 16) == '|') && newGen.getBlock((i * sampleWidth)+4, 16) == '|'){
+                        System.out.println("Big Shroom!");
+                        model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)/5, 0, sampleWidth, model.getHeight(), lvl);
+                    }
 
-//                    if((model.getBlock(i * sampleWidth, 16) == '-' && newGen.getBlock(i*sampleWidth, 16) == '-') && (model.getBlock((i * sampleWidth) +1, 16) == '-' && newGen.getBlock((i*sampleWidth)+1, 16) == '-')){
-//                        System.out.println("Big Gap!");
-//                        model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)+3, 0, sampleWidth, model.getHeight(), lvl);
-//                    }
+                    if((newGen.getBlock((i * sampleWidth), 3) == 'T' || newGen.getBlock((i * sampleWidth), 4) == '|')){
+                        System.out.println("Big Pipe!");
+                        model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)-1, 0, sampleWidth, model.getHeight(), lvl);
+                    }
 
-//                    for (int k = 0; k < sampleWidth+1; k++){
-//                        //Prevents us from having two flags in a level
-//                        if(newGen.getBlock((i * sampleWidth)+k, 14) == 'F' || newGen.getBlock((i * sampleWidth)+k, 13) == 'F' || newGen.getBlock((i * sampleWidth)+k, 12) == 'F' || newGen.getBlock((i * sampleWidth)+k, 11) == 'F'){
-//                            System.out.println("Two Flags");
-//                            model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)-, 0, sampleWidth, model.getHeight(), lvl);
-//                        }
-////                        if((model.getBlock(i * sampleWidth, 16) == '-' && newGen.getBlock(i*sampleWidth, 16) == '-') && (model.getBlock((i * sampleWidth) +1, 16) == '-' && newGen.getBlock((i*sampleWidth)+1, 16) == '-')){
-////                            System.out.println("Big Gap!");
-////                            model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)+3, 0, sampleWidth, model.getHeight(), lvl);
-////                        }
-//                    }
+                    for (int k = 0; k < sampleWidth+1; k++){
+                        if(newGen.getBlock((i * sampleWidth)+k, 14) == 'F' || newGen.getBlock((i * sampleWidth)+k, 13) == 'F' || newGen.getBlock((i * sampleWidth)+k, 12) == 'F' || newGen.getBlock((i * sampleWidth)+k, 11) == 'F'){
+                            System.out.println("Two Flags");
+                            model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)/5, 0, sampleWidth, model.getHeight(), lvl);
+                        }
+                    }
+
+                    if((newGen.getBlock((i * sampleWidth), 16) == '-' && newGen.getBlock((i * sampleWidth)+1, 16) == '-') && (newGen.getBlock((i * sampleWidth)+2, 16) == '-' && newGen.getBlock((i * sampleWidth)+3, 16) == '-') && newGen.getBlock((i * sampleWidth)+4, 16) == '-'){
+                        System.out.println("Big Gap!");
+                        model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)/5, 0, sampleWidth, model.getHeight(), lvl);
+                    }
+
                     model.copyFromString(i * sampleWidth, 0, i * sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
                 }
             } catch (IOException e) {
