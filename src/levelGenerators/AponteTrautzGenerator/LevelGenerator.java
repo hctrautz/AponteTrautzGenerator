@@ -24,6 +24,7 @@ public class LevelGenerator implements MarioLevelGenerator{
 
     public LevelGenerator() throws IOException {}
 
+    //Retrieves the specified level from the /levels/original/ folder
     private String getLevel(int lvl) throws IOException {
         File[] listOfFiles = new File(folderName).listFiles();
         List<String> lines = Files.readAllLines(listOfFiles[lvl].toPath());
@@ -35,10 +36,7 @@ public class LevelGenerator implements MarioLevelGenerator{
         return result;
     }
 
-
-
-
-
+    //Generates the sequence of levels that we will take from in order to construct our final level.
     public int [] runMarkov() throws IOException{
         int [] output = new int[999];
         // the state transition matrix
@@ -61,9 +59,12 @@ public class LevelGenerator implements MarioLevelGenerator{
                 {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00},
         };
 
-        int N = 15; // number of states
-        int state = N-1; // current state
-        int transitionCount = 0; // number of transitions
+        // Total # of States
+        int N = 15;
+        //Current state
+        int state = N-1;
+        //Total number of transitions preformed
+        int transitionCount = 0;
 
         // run Markov chain
         while (state > 0) {
@@ -86,16 +87,16 @@ public class LevelGenerator implements MarioLevelGenerator{
         return output;
     }
 
+    //Constructs our final level by pulling chunks from each level in the order that we generated using the Markov Chain
     public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) throws IOException {
-        MarioLevelModel oldGen = new MarioLevelModel(100,100);
-
+        //Clear the previously constructed map
         model.clearMap();
-
+        //Loop through until we have a level whose length/width matches the length we desire (200)
         for(int i=0; i<model.getWidth() / sampleWidth; i++){
             try {
+                //Calculate the width of the current level in the markov chain, that we want copy into our generated level
                 String lvl = getLevel(order[i]);
                 char [] lvlArr = lvl.toCharArray();
-
                 int lvlLength = 0;
                 for(char c: lvlArr){
                     if(c == '\n'){
@@ -105,24 +106,25 @@ public class LevelGenerator implements MarioLevelGenerator{
                     }
                 }
 
+                //Create a model from the current level in the markov chain, so that we can compare it to what we already have created from the generated level
                 MarioLevelModel newGen = new MarioLevelModel(lvlLength,16);
                 newGen.copyFromString(lvl);
                 //System.out.println("X: " + flag[0] + " Y: " + flag[1]);
 
                 //TODO: Only copy the lines of code from the level that will match up with what we already have
-
-                //needs if statements that compare old model to new model to see if it is okay to continue
-                //oldGen.getBlock(oldGen.getWidth(), 4) == 'F'
+                //On the last iteration of the loop, copy the last 5 lines of the level that was selected by the markov chain. This ensures that every level we generate has a flag at the end.
                 if(i+1 == model.getWidth()/sampleWidth){
                     //System.out.println("\n Last State! \n" + "State #: " + order[i] + "\n");
                     //System.out.println(newGen.getWidth());
                     model.copyFromString(i*sampleWidth, 0, newGen.getWidth()-sampleWidth, 0,  sampleWidth, newGen.getHeight(), lvl);
                     System.out.print("Index: " + i + "\n");
                 } else {
-                    model.copyFromString(i*sampleWidth, 0, i*sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
-                    oldGen = model.clone(); //saves a copy of the model
+                    if(model.getBlock(i * sampleWidth, 0) == newGen.getBlock(i*sampleWidth, 0)) {
+                        model.copyFromString(i * sampleWidth, 0, i * sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
+                    } else {
+                        System.out.println("Skipped!");
+                    }
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
