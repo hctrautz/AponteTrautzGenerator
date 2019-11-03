@@ -11,16 +11,8 @@ import java.util.Random;
 
 public class LevelGenerator implements MarioLevelGenerator{
     int [] order = runMarkov();
-    private int sampleWidth = 11;
-    private String folderName = "levels/aponteTrautz/";
-    private final int GROUND_Y_LOCATION = 13;
-    private final float GROUND_PROB = 0.4f;
-    private final int OBSTACLES_LOCATION = 10;
-    private final float OBSTACLES_PROB = 0.1f;
-    private final int COLLECTIBLE_LOCATION = 3;
-    private final float COLLECTIBLE_PROB = 0.05f;
-    private final float ENMEY_PROB = 0.1f;
-    private final int FLOOR_PADDING = 3;
+    private int sampleWidth = 9;
+    private String folderName = "src/levelGenerators/AponteTrautzGenerator/levels/";
 
     public LevelGenerator() throws IOException {}
 

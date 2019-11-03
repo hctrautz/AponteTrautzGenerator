@@ -25,7 +25,7 @@ public class GenerateLevel {
     
     public static void main(String[] args) throws IOException {
 	MarioLevelGenerator generator = new levelGenerators.AponteTrautzGenerator.LevelGenerator();
-	String level = generator.getGeneratedLevel(new MarioLevelModel(176, 16), new MarioTimer(5*60*60*1000));
+	String level = generator.getGeneratedLevel(new MarioLevelModel(150, 16), new MarioTimer(5*60*60*1000));
 	MarioGame game = new MarioGame();
 	System.out.println("\n\n");
 	System.out.println(level);
