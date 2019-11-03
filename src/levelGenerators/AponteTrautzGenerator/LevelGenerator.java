@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class LevelGenerator implements MarioLevelGenerator{
     int [] order = runMarkov();
-    private int sampleWidth = 12;
+    private int sampleWidth = 15;
     private String folderName = "levels/original/";
     private final int GROUND_Y_LOCATION = 13;
     private final float GROUND_PROB = 0.4f;
@@ -39,8 +39,7 @@ public class LevelGenerator implements MarioLevelGenerator{
     //Generates the sequence of levels that we will take from in order to construct our final level.
     public int [] runMarkov() throws IOException{
         int [] output = new int[999];
-        // the state transition matrix
-        //TODO: add new values to calculate regarding the probability of state transitions
+        // the state transition matrix for mapping probability of any given level chunk following immediately from the current one
         double[][] transition = {
                 {0.004, 0.017, 0.023, 0.036, 0.046, 0.072, 0.091, 0.123, 0.177, 0.124, 0.116, 0.086, 0.062, 0.013, 0.010},
                 {0.091, 0.177, 0.072, 0.017, 0.116, 0.013, 0.023, 0.036, 0.004, 0.010, 0.086, 0.046, 0.124, 0.123, 0.062},
@@ -49,14 +48,14 @@ public class LevelGenerator implements MarioLevelGenerator{
                 {0.036, 0.023, 0.177, 0.010, 0.124, 0.072, 0.046, 0.091, 0.086, 0.013, 0.116, 0.123, 0.004, 0.017, 0.062},
                 {0.046, 0.036, 0.004, 0.177, 0.023, 0.116, 0.017, 0.123, 0.013, 0.091, 0.062, 0.072, 0.086, 0.124, 0.010},
                 {0.062, 0.091, 0.023, 0.004, 0.046, 0.010, 0.116, 0.036, 0.072, 0.123, 0.177, 0.124, 0.017, 0.013, 0.086},
-                {0.023, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.066, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00, 0.067},
-                {0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.00},
+                {0.023, 0.072, 0.010, 0.017, 0.091, 0.046, 0.036, 0.062, 0.116, 0.013, 0.004, 0.086, 0.124, 0.177, 0.123},
+                {0.177, 0.023, 0.086, 0.062, 0.017, 0.123, 0.091, 0.116, 0.046, 0.036, 0.013, 0.124, 0.072, 0.004, 0.010},
+                {0.004, 0.123, 0.046, 0.086, 0.116, 0.013, 0.177, 0.036, 0.072, 0.124, 0.023, 0.062, 0.010, 0.017, 0.091},
+                {0.023, 0.062, 0.091, 0.116, 0.036, 0.046, 0.004, 0.086, 0.017, 0.013, 0.072, 0.177, 0.123, 0.010, 0.124},
+                {0.017, 0.046, 0.116, 0.036, 0.177, 0.072, 0.013, 0.123, 0.062, 0.086, 0.091, 0.004, 0.023, 0.124, 0.010},
+                {0.062, 0.091, 0.023, 0.123, 0.004, 0.036, 0.046, 0.177, 0.124, 0.116, 0.013, 0.017, 0.086, 0.010, 0.072},
+                {0.124, 0.123, 0.036, 0.010, 0.013, 0.177, 0.062, 0.004, 0.023, 0.046, 0.086, 0.116, 0.072, 0.091, 0.017},
+                {0.046, 0.036, 0.072, 0.116, 0.023, 0.004, 0.091, 0.013, 0.086, 0.177, 0.062, 0.010, 0.123, 0.017, 0.124},
         };
 
         // Total # of States
@@ -67,7 +66,7 @@ public class LevelGenerator implements MarioLevelGenerator{
         int transitionCount = 0;
 
         // run Markov chain
-        for (int i = 0; i < N; i++) {
+        for (int i = 0; i < N+1; i++) {
 
             System.out.println("State: " + state);
             output[transitionCount] = state;
@@ -92,7 +91,7 @@ public class LevelGenerator implements MarioLevelGenerator{
     public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) throws IOException {
         //Clear the previously constructed map
         model.clearMap();
-        //Loop through until we have a level whose length/width matches the length we desire (200)
+        //Loop through until we have a level whose length/width matches the length we desire
         for(int i=0; i<model.getWidth() / sampleWidth; i++){
             try {
                 //Calculate the width of the current level in the markov chain, that we want copy into our generated level
@@ -121,12 +120,24 @@ public class LevelGenerator implements MarioLevelGenerator{
                     System.out.print("Index: " + i + "\n");
                 } else {
                     //If there exists a gap that is 4 blocks long at the end of our current model, do not copy a gap from the new level.
-                    if((model.getBlock(i * sampleWidth, 16) == '-' && newGen.getBlock(i*sampleWidth, 16) == '-') && (model.getBlock((i * sampleWidth) +1, 16) == '-' && newGen.getBlock((i*sampleWidth)+1, 16) == '-') &&
-                            (model.getBlock((i * sampleWidth) +2, 16) == '-' && newGen.getBlock((i*sampleWidth)+2, 16) == '-') && (model.getBlock((i * sampleWidth) +3, 16) == '-' && newGen.getBlock((i*sampleWidth)+3, 16) == '-')){
-                        model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)+3, 0, sampleWidth, model.getHeight(), lvl);
-                    } else {
-                        model.copyFromString(i * sampleWidth, 0, i * sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
-                    }
+
+//                    if((model.getBlock(i * sampleWidth, 16) == '-' && newGen.getBlock(i*sampleWidth, 16) == '-') && (model.getBlock((i * sampleWidth) +1, 16) == '-' && newGen.getBlock((i*sampleWidth)+1, 16) == '-')){
+//                        System.out.println("Big Gap!");
+//                        model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)+3, 0, sampleWidth, model.getHeight(), lvl);
+//                    }
+
+//                    for (int k = 0; k < sampleWidth+1; k++){
+//                        //Prevents us from having two flags in a level
+//                        if(newGen.getBlock((i * sampleWidth)+k, 14) == 'F' || newGen.getBlock((i * sampleWidth)+k, 13) == 'F' || newGen.getBlock((i * sampleWidth)+k, 12) == 'F' || newGen.getBlock((i * sampleWidth)+k, 11) == 'F'){
+//                            System.out.println("Two Flags");
+//                            model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)-, 0, sampleWidth, model.getHeight(), lvl);
+//                        }
+////                        if((model.getBlock(i * sampleWidth, 16) == '-' && newGen.getBlock(i*sampleWidth, 16) == '-') && (model.getBlock((i * sampleWidth) +1, 16) == '-' && newGen.getBlock((i*sampleWidth)+1, 16) == '-')){
+////                            System.out.println("Big Gap!");
+////                            model.copyFromString(i * sampleWidth, 0, (i * sampleWidth)+3, 0, sampleWidth, model.getHeight(), lvl);
+////                        }
+//                    }
+                    model.copyFromString(i * sampleWidth, 0, i * sampleWidth, 0, sampleWidth, model.getHeight(), lvl);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
