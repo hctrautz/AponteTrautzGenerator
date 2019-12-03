@@ -171,6 +171,18 @@ public class Agent implements MarioAgent {
 		return dstate;
 	}
 
+	private int backValue(byte[][] levelSceneFromBitmap, int currentX){
+		int spaces = 0;
+		for (int x = currentX-4; x <= currentX; x++) {
+			for (int y = 5; y <= 9; y++) {
+				if (levelSceneFromBitmap[x][y] == 1) {
+					spaces = spaces +1;
+				}
+			}
+		}
+		return spaces;
+	}
+
 	@Override
 	public boolean[] getActions(MarioForwardModel model, MarioTimer timer) {
 		byte[][] levelSceneFromBitmap = decode(model, model.getMarioSceneObservation()); // map of the scene
@@ -187,28 +199,33 @@ public class Agent implements MarioAgent {
 				System.out.println("SafeToJump: " + safeToJump(levelSceneFromBitmap, enemiesFromBitmap));
 				System.out.println("MayMarioJump: " +  model.mayMarioJump());
 
-				if (leftCounter > 5) {
+				if (leftCounter > backValue(levelSceneFromBitmap, model.getMarioScreenTilePos()[0])) {
 					if ((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
 							&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap)) || dangerFromGaps(levelSceneFromBitmap))
-							&& model.mayMarioJump()){
+							&& model.mayMarioJump()) {
 						facing_left = false;
 						leftCounter = 0;
 						state = STATE.JUMP;
-					} else if (dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap)){
+					} else if (dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap)) {
 						state = STATE.JUMP;
 						facing_left = false;
 						leftCounter = 0;
 					}
+//					 else if(!bricksAboveMario(levelSceneFromBitmap)){
+//						state = STATE.JUMP;
+//						facing_left = false;
+//						leftCounter = 0;
+//					}
 					else {
 						state = STATE.WALK_FORWARD;
 						facing_left = false;
 						leftCounter = 0;
 					}
 				}
-				leftCounter++;
+
 				action[MarioActions.LEFT.getValue()] = true;
 				action[MarioActions.RIGHT.getValue()] = false;
-
+				leftCounter++;
 
 //				else if (!(((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
 //						&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap)) || dangerFromGaps(levelSceneFromBitmap))
@@ -241,6 +258,7 @@ public class Agent implements MarioAgent {
 				break;
 
 			case JUMP:
+//				int currentPos = model.getMarioScreenTilePos()[0];
 				System.out.println(state);
 				System.out.println("Enemy: " + dangerFromEnemies(enemiesFromBitmap));
 				System.out.println("Block: " + block(levelSceneFromBitmap));
@@ -258,6 +276,9 @@ public class Agent implements MarioAgent {
 					action[MarioActions.SPEED.getValue()] = false;
 					jumpCount = 0;
 
+					if(!model.mayMarioJump() && block(levelSceneFromBitmap) && safeToJump(levelSceneFromBitmap, enemiesFromBitmap)){
+						state = STATE.WALK_BACKWARD;
+					}
 					if (!(((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
 							&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap)) || dangerFromGaps(levelSceneFromBitmap))
 							&& model.mayMarioJump()) {
@@ -266,6 +287,7 @@ public class Agent implements MarioAgent {
 						state = STATE.IDLE;
 					}
 				}
+
 				// otherwise you're in the middle of jump, increment jumpCount
 				else if (action[MarioActions.JUMP.getValue()]) {
 					jumpCount++;
@@ -306,6 +328,7 @@ public class Agent implements MarioAgent {
 				}
 
 //				if((bricksAboveMario(levelSceneFromBitmap) && !safeToJump(levelSceneFromBitmap, enemiesFromBitmap)) && dangerFromEnemies(enemiesFromBitmap)){
+//					facing_left = true;
 //					state = STATE.WALK_BACKWARD;
 //				}
 
