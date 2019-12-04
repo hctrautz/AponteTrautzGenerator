@@ -19,9 +19,11 @@ public class Agent implements MarioAgent {
 	private int jumpCount;  // counter to determine if you've done a 'full' jump yet
 	private int shootCounter;
 	private int powerUp;
+	private int marioPos;
 	private STATE state;
 	int totalCount = 0;
 	boolean waitingForPowerUp;
+	boolean enemyAbove;
 	private boolean[] action;
 
 	@Override
@@ -33,6 +35,7 @@ public class Agent implements MarioAgent {
 		leftCounter = 0;
 		shootCounter = 0;
 		powerUp = 0;
+		boolean enemyAbove = false;
 		boolean waitingForPowerUp = false;
 	}
 
@@ -49,8 +52,8 @@ public class Agent implements MarioAgent {
 	}
 
 	private boolean bricksAboveMario(int[][] levelSceneFromBitmap){
-		for (int x = 9; x <= 9; x++){
-			for(int y = 2; y <=5; y ++){
+		for (int x = 10; x <= 10; x++){
+			for(int y = 5; y <=6; y ++){
 				if(levelSceneFromBitmap[x][y] == 24){
 					return true;
 				}
@@ -60,7 +63,7 @@ public class Agent implements MarioAgent {
 	}
 
 	private boolean powerUpBehind(int[][] levelSceneFromBitmap){
-		for (int x = 8; x <= 8; x++){
+		for (int x = 0; x <= 12; x++){
 			for(int y = 0; y <=12; y ++){
 				if(levelSceneFromBitmap[x][y] == 12){
 					return true;
@@ -103,6 +106,19 @@ public class Agent implements MarioAgent {
 	// implies you should jump
 	private boolean dangerFromEnemies(byte[][] enemiesFromBitmap) {
 		for (int y = 5; y <= 9; y++) {
+			for (int x = 7; x <= 12; x++) {
+				if (!(x == 8 && y == 8) && enemiesFromBitmap[x][y] == 1) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	// determines if there are enemies close enough to pose a danger to you -
+	// implies you should jump
+	private boolean dangerFromAbove(byte[][] enemiesFromBitmap) {
+		for (int y = 7; y <= 12; y++) {
 			for (int x = 7; x <= 12; x++) {
 				if (!(x == 8 && y == 8) && enemiesFromBitmap[x][y] == 1) {
 					return true;
@@ -169,7 +185,7 @@ public class Agent implements MarioAgent {
 
 	private int obsHeight(byte[][] levelSceneFromBitmap, int currentX) {
 		int height = 0;
-		for (int x = currentX; x <= currentX; x++) {
+		for (int x = 8; x <= 8; x++) {
 			for (int y = 5; y <= 9; y++) {
 				if (levelSceneFromBitmap[x][y] == 1) {
 					height = height +1;
@@ -228,7 +244,7 @@ public class Agent implements MarioAgent {
 		int[][] completeObs = model.getMarioCompleteObservation(0,0);
 		byte[][] levelSceneFromBitmap = decode(model, model.getMarioSceneObservation()); // map of the scene
 		byte[][] enemiesFromBitmap = decode(model, model.getMarioEnemiesObservation()); // map of enemies
-
+		model.getSpriteTypeGeneralization(SpriteType.FIRE_FLOWER, 0);
 		System.out.println(Arrays.deepToString(completeObs));
 
 		switch (state) {
@@ -244,7 +260,7 @@ public class Agent implements MarioAgent {
 				action[MarioActions.LEFT.getValue()] = false;
 				action[MarioActions.RIGHT.getValue()] = true;
 				action[MarioActions.JUMP.getValue()] = false;
-				action[MarioActions.SPEED.getValue()] = false;
+				action[MarioActions.SPEED.getValue()] = true;
 
 				// now, if you're in danger from enemies, or blocked by landscape, jump if it's
 				// safe to. If there's danger of falling, jump no matter what
@@ -255,24 +271,17 @@ public class Agent implements MarioAgent {
 					state = STATE.JUMP;
 				}
 
-				else if(powerUpBehind(completeObs)){
-					System.out.println("POWER UP DETECTED");
-					waitingForPowerUp = true;
-					state = STATE.IDLE;
-				}
-
 				//if there is a brick directly above mario and there are no enemies then we want to jump
 				else if(bricksAboveMario(completeObs) && !dangerFromEnemies(enemiesFromBitmap)){
 					System.out.println("IM A BRICK!!!");
-//					if(model.getNumDestroyedBricks() > powerUp){
-//						powerUp = powerUp + 1;
-//						state = STATE.IDLE;
-//					}
 					state = STATE.JUMP;
 				}
 				//if there is a enemy or obstacle, and we are unable to safely jump over it then move backwards.
 				else if((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap)) && (safeToJump(levelSceneFromBitmap, enemiesFromBitmap) != model.mayMarioJump())) {
 					state = STATE.WALK_BACKWARD;
+				}
+				else if(model.getMarioMode() == 1 && levelSceneFromBitmap[9][model.getMarioScreenTilePos()[1]] ==1){
+					state = STATE.JUMP;
 				}
 				break;
 
@@ -294,7 +303,6 @@ public class Agent implements MarioAgent {
 					facing_left = false;
 					state = STATE.IDLE;
 				}
-
 				break;
 
 			case JUMP:
@@ -322,9 +330,18 @@ public class Agent implements MarioAgent {
 							&& model.mayMarioJump()) {
 						state = STATE.WALK_FORWARD;
 					}
+
 					else {
 						state = STATE.IDLE;
 					}
+				}
+
+				else if(powerUpBehind(completeObs) && !dangerFromEnemies(enemiesFromBitmap) && model.getMarioMode()==0){
+						System.out.println("POWER UP DETECTED");
+						waitingForPowerUp = true;
+						action[MarioActions.RIGHT.getValue()] = false;
+						jumpCount = 0;
+						state = STATE.IDLE;
 				}
 
 				// otherwise you're in the middle of jump, increment jumpCount
@@ -347,7 +364,7 @@ public class Agent implements MarioAgent {
 				System.out.println("MayMarioJump: " +  model.mayMarioJump());
 
 					//If there is an obstacle in front of you and no enemy, jump exactly the height of the obstacle. Used for stairs/pipes.
-					if((safeToJump(levelSceneFromBitmap, enemiesFromBitmap) != model.mayMarioJump()) && block(levelSceneFromBitmap) && !dangerFromEnemies(enemiesFromBitmap)){
+					if((safeToJump(levelSceneFromBitmap, enemiesFromBitmap) != model.mayMarioJump()) && block(levelSceneFromBitmap) && !dangerFromEnemies(enemiesFromBitmap) && !dangerFromGaps(levelSceneFromBitmap)){
 						System.out.println("MayMarioJump: " +  obsHeight(levelSceneFromBitmap, model.getMarioScreenTilePos()[0]));
 						jumpCount = 8 - (1 + obsHeight(levelSceneFromBitmap, model.getMarioScreenTilePos()[0]));
 						action[MarioActions.RIGHT.getValue()] = true;
@@ -355,21 +372,20 @@ public class Agent implements MarioAgent {
 						System.out.println("SHORT JUMP");
 					}
 
-					else if(powerUpBehind(completeObs)){
-						System.out.println("POWER UP DETECTED");
-						waitingForPowerUp = true;
-						state = STATE.IDLE;
-					}
-
 					else if(waitingForPowerUp){
-						System.out.println("WAITING");
-						state = STATE.IDLE;
+						if(!powerUpBehind(completeObs)){
+							waitingForPowerUp = false;
+							state = STATE.WALK_FORWARD;
+						} else {
+							System.out.println("WAITING");
+							state = STATE.IDLE;
+						}
 					}
 					// now, if you're in danger from enemies, or blocked by landscape, jump if it's
 					// safe to. If there's danger of falling, jump no matter what
-					else if ((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
+					else if (((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
 							&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap)) || dangerFromGaps(levelSceneFromBitmap))
-							&& model.mayMarioJump()){
+							&& model.mayMarioJump())){
 //						jumpCount = 8 - ((model.getMarioScreenTilePos()[0] - locateEnemy(enemiesFromBitmap)));
 						action[MarioActions.RIGHT.getValue()] = true;
 						state = STATE.JUMP;
@@ -381,6 +397,10 @@ public class Agent implements MarioAgent {
 						state = STATE.WALK_BACKWARD;
 						System.out.println("R");
 					}
+
+//					else if(dangerFromAbove(enemiesFromBitmap)){
+//						state = STATE.IDLE;
+//					}
 
 					//If there is an enemy ahead and it is not safe to jump it, jump as long as we are able to.
 					else if(dangerFromEnemies(enemiesFromBitmap) && !safeToJump(levelSceneFromBitmap, enemiesFromBitmap) && model.mayMarioJump()){
