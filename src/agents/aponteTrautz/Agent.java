@@ -117,10 +117,10 @@ public class Agent implements MarioAgent {
 
 	// determines if there are enemies close enough to pose a danger to you -
 	// implies you should jump
-	private boolean dangerFromAbove(byte[][] enemiesFromBitmap) {
-		for (int y = 7; y <= 12; y++) {
-			for (int x = 7; x <= 12; x++) {
-				if (!(x == 8 && y == 8) && enemiesFromBitmap[x][y] == 1) {
+	private boolean dangerFromAbove(byte[][] enemiesFromBitmap, int marioY) {
+		for (int y = marioY-4; y < marioY; y++) {
+			for (int x = 8; x <= 9; x++) {
+				if (enemiesFromBitmap[x][y] == 1) {
 					return true;
 				}
 			}
@@ -381,42 +381,33 @@ public class Agent implements MarioAgent {
 							state = STATE.IDLE;
 						}
 					}
+					else if(dangerFromAbove(enemiesFromBitmap, model.getMarioScreenTilePos()[1])){
+						System.out.println("DANGER FROM ABOVE");
+						state = STATE.IDLE;
+					}
 					// now, if you're in danger from enemies, or blocked by landscape, jump if it's
 					// safe to. If there's danger of falling, jump no matter what
 					else if (((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
 							&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap)) || dangerFromGaps(levelSceneFromBitmap))
 							&& model.mayMarioJump())){
-//						jumpCount = 8 - ((model.getMarioScreenTilePos()[0] - locateEnemy(enemiesFromBitmap)));
 						action[MarioActions.RIGHT.getValue()] = true;
 						state = STATE.JUMP;
 						System.out.println("NORMAL JUMP");
 					}
-
 					//Run backwards if Mario is unable to jump and there is an enemy ahead, even if it is safe jump
 					else if(dangerFromEnemies(enemiesFromBitmap) && !model.mayMarioJump() && safeToJump(levelSceneFromBitmap, enemiesFromBitmap)) {
 						state = STATE.WALK_BACKWARD;
 						System.out.println("R");
 					}
-
-//					else if(dangerFromAbove(enemiesFromBitmap)){
-//						state = STATE.IDLE;
-//					}
-
 					//If there is an enemy ahead and it is not safe to jump it, jump as long as we are able to.
-					else if(dangerFromEnemies(enemiesFromBitmap) && !safeToJump(levelSceneFromBitmap, enemiesFromBitmap) && model.mayMarioJump()){
-//						if(bricksAboveMario(levelSceneFromBitmap)){
-//							state = STATE.WALK_BACKWARD;
-//						} else{
+					else if(dangerFromEnemies(enemiesFromBitmap) && !safeToJump(levelSceneFromBitmap, enemiesFromBitmap) && model.mayMarioJump() && !dangerFromGaps(levelSceneFromBitmap)){
 							action[MarioActions.RIGHT.getValue()] = true;
 							state = STATE.JUMP;
 							System.out.println("Enemy Panic Jump");
-
 					}
-
 					else if (!dangerFromEnemies(enemiesFromBitmap) && !dangerFromGaps(levelSceneFromBitmap)){
 						state = STATE.WALK_FORWARD;
 					}
-
 					else {
 						state = STATE.IDLE;
 					}
