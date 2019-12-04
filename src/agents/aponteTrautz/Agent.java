@@ -4,6 +4,7 @@ import engine.core.MarioAgent;
 import engine.core.MarioForwardModel;
 import engine.core.MarioTimer;
 import engine.helper.MarioActions;
+import engine.helper.SpriteType;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -17,8 +18,10 @@ public class Agent implements MarioAgent {
 	private int leftCounter;
 	private int jumpCount;  // counter to determine if you've done a 'full' jump yet
 	private int shootCounter;
+	private int powerUp;
 	private STATE state;
 	int totalCount = 0;
+	boolean waitingForPowerUp;
 	private boolean[] action;
 
 	@Override
@@ -29,6 +32,8 @@ public class Agent implements MarioAgent {
 		jumpCount = 0;
 		leftCounter = 0;
 		shootCounter = 0;
+		powerUp = 0;
+		boolean waitingForPowerUp = false;
 	}
 
 	// determines if jumping will cause you to hit an enemy or not
@@ -43,10 +48,21 @@ public class Agent implements MarioAgent {
 		return true;
 	}
 
-	private boolean bricksAboveMario(byte[][] levelSceneFromBitmap){
+	private boolean bricksAboveMario(int[][] levelSceneFromBitmap){
+		for (int x = 9; x <= 9; x++){
+			for(int y = 2; y <=5; y ++){
+				if(levelSceneFromBitmap[x][y] == 24){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean powerUpBehind(int[][] levelSceneFromBitmap){
 		for (int x = 8; x <= 8; x++){
-			for(int y = 3; y <=5; y ++){
-				if(levelSceneFromBitmap[x][y] == 1){
+			for(int y = 0; y <=12; y ++){
+				if(levelSceneFromBitmap[x][y] == 12){
 					return true;
 				}
 			}
@@ -209,10 +225,11 @@ public class Agent implements MarioAgent {
 
 	@Override
 	public boolean[] getActions(MarioForwardModel model, MarioTimer timer) {
+		int[][] completeObs = model.getMarioCompleteObservation(0,0);
 		byte[][] levelSceneFromBitmap = decode(model, model.getMarioSceneObservation()); // map of the scene
 		byte[][] enemiesFromBitmap = decode(model, model.getMarioEnemiesObservation()); // map of enemies
 
-		System.out.println(Arrays.deepToString(levelSceneFromBitmap));
+		System.out.println(Arrays.deepToString(completeObs));
 
 		switch (state) {
 			case WALK_FORWARD:
@@ -238,9 +255,19 @@ public class Agent implements MarioAgent {
 					state = STATE.JUMP;
 				}
 
+				else if(powerUpBehind(completeObs)){
+					System.out.println("POWER UP DETECTED");
+					waitingForPowerUp = true;
+					state = STATE.IDLE;
+				}
+
 				//if there is a brick directly above mario and there are no enemies then we want to jump
-				else if(bricksAboveMario(levelSceneFromBitmap) && !dangerFromEnemies(enemiesFromBitmap)){
+				else if(bricksAboveMario(completeObs) && !dangerFromEnemies(enemiesFromBitmap)){
 					System.out.println("IM A BRICK!!!");
+//					if(model.getNumDestroyedBricks() > powerUp){
+//						powerUp = powerUp + 1;
+//						state = STATE.IDLE;
+//					}
 					state = STATE.JUMP;
 				}
 				//if there is a enemy or obstacle, and we are unable to safely jump over it then move backwards.
@@ -328,6 +355,16 @@ public class Agent implements MarioAgent {
 						System.out.println("SHORT JUMP");
 					}
 
+					else if(powerUpBehind(completeObs)){
+						System.out.println("POWER UP DETECTED");
+						waitingForPowerUp = true;
+						state = STATE.IDLE;
+					}
+
+					else if(waitingForPowerUp){
+						System.out.println("WAITING");
+						state = STATE.IDLE;
+					}
 					// now, if you're in danger from enemies, or blocked by landscape, jump if it's
 					// safe to. If there's danger of falling, jump no matter what
 					else if ((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
@@ -347,13 +384,13 @@ public class Agent implements MarioAgent {
 
 					//If there is an enemy ahead and it is not safe to jump it, jump as long as we are able to.
 					else if(dangerFromEnemies(enemiesFromBitmap) && !safeToJump(levelSceneFromBitmap, enemiesFromBitmap) && model.mayMarioJump()){
-						if(bricksAboveMario(levelSceneFromBitmap)){
-							state = STATE.WALK_BACKWARD;
-						} else{
+//						if(bricksAboveMario(levelSceneFromBitmap)){
+//							state = STATE.WALK_BACKWARD;
+//						} else{
 							action[MarioActions.RIGHT.getValue()] = true;
 							state = STATE.JUMP;
 							System.out.println("Enemy Panic Jump");
-						}
+
 					}
 
 					else if (!dangerFromEnemies(enemiesFromBitmap) && !dangerFromGaps(levelSceneFromBitmap)){
