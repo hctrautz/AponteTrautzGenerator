@@ -148,7 +148,6 @@ public class Agent implements MarioAgent {
 	} else {
 	    action[MarioActions.SPEED.getValue()] = true;
 	}
-
 	return action;
     }
 
