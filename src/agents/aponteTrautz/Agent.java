@@ -221,7 +221,6 @@ public class Agent implements MarioAgent {
 		int[][] completeObs = model.getMarioCompleteObservation(0,0);
 		byte[][] levelSceneFromBitmap = decode(model, model.getMarioSceneObservation()); // map of the scene
 		byte[][] enemiesFromBitmap = decode(model, model.getMarioEnemiesObservation()); // map of enemies
-		model.getSpriteTypeGeneralization(SpriteType.FIRE_FLOWER, 0);
 		System.out.println(Arrays.deepToString(completeObs));
 
 		switch (state) {
@@ -242,7 +241,7 @@ public class Agent implements MarioAgent {
 				// now, if you're in danger from enemies, or blocked by landscape, jump if it's
 				// safe to. If there's danger of falling, jump no matter what
 				if ((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
-						&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs)) || (levelSceneFromBitmap[model.getMarioScreenTilePos()[0]+1][9] == 0))
+						&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs)) ||  levelSceneFromBitmap[model.getMarioScreenTilePos()[0]+1][9] == 0)
 						&& model.mayMarioJump()){
 					action[MarioActions.SPEED.getValue()] = true;
 					state = STATE.JUMP;
@@ -361,8 +360,8 @@ public class Agent implements MarioAgent {
 				// now, if you're in danger from enemies, or blocked by landscape, jump if it's
 				// safe to. If there's danger of falling, jump no matter what
 				else if (((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
-						&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs)) || (levelSceneFromBitmap[model.getMarioScreenTilePos()[0]+1][9] == 0))
-						&& model.mayMarioJump())){
+						&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs)) || (levelSceneFromBitmap[model.getMarioScreenTilePos()[0]+1][9] == 0)))
+						&& model.mayMarioJump()){
 					action[MarioActions.RIGHT.getValue()] = true;
 					state = STATE.JUMP;
 					System.out.println("NORMAL JUMP");
@@ -383,6 +382,13 @@ public class Agent implements MarioAgent {
 				else if (!dangerFromEnemies(enemiesFromBitmap) && !dangerFromGaps(levelSceneFromBitmap)){
 					state = STATE.WALK_FORWARD;
 				}
+				else if((completeObs[model.getMarioScreenTilePos()[0]][model.getMarioScreenTilePos()[1]+1] == 34) || (completeObs[model.getMarioScreenTilePos()[0]][model.getMarioScreenTilePos()[1]+1] == 35) || (completeObs[model.getMarioScreenTilePos()[0]][model.getMarioScreenTilePos()[1]+1] == 36) || (completeObs[model.getMarioScreenTilePos()[0]][model.getMarioScreenTilePos()[1]+1] == 37)){
+					state = STATE.JUMP;
+				 }
+
+				 else if(model.getMarioScreenTilePos()[1] < 8 &&levelSceneFromBitmap[model.getMarioScreenTilePos()[0]+1][9] != 0){
+					 state = STATE.JUMP;
+				 }
 				else {
 					state = STATE.IDLE;
 				}
