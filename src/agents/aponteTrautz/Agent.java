@@ -141,7 +141,6 @@ public class Agent implements MarioAgent {
 	// implies you should jump
 	private boolean dangerFromAbove(byte[][] enemiesFromBitmap, int marioY) {
 		for (int y = marioY-1; y > 0 ; y--) {
-			System.out.println(y);
 			for (int x = 6; x <= 12; x++) {
 				if (enemiesFromBitmap[x][y] == 1) {
 					return true;
@@ -245,7 +244,6 @@ public class Agent implements MarioAgent {
 				System.out.println("Gaps: " + dangerFromGaps(levelSceneFromBitmap));
 				System.out.println("SafeToJump: " + safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs));
 				System.out.println("MayMarioJump: " +  model.mayMarioJump());
-				System.out.println(model.getMarioScreenTilePos()[1]);
 
 				action[MarioActions.LEFT.getValue()] = false;
 				action[MarioActions.RIGHT.getValue()] = true;
@@ -270,7 +268,7 @@ public class Agent implements MarioAgent {
 				}
 
 				//if there is a brick directly above mario and there are no enemies then we want to jump
-				else if(bricksAboveMario(completeObs) && !dangerFromEnemies(enemiesFromBitmap)){
+				else if(model.getMarioMode() == 0 && bricksAboveMario(completeObs) && !dangerFromEnemies(enemiesFromBitmap)){
 					System.out.println("IM A BRICK!!!");
 					state = STATE.JUMP;
 				}
@@ -312,7 +310,6 @@ public class Agent implements MarioAgent {
 				System.out.println("Gaps: " + dangerFromGaps(levelSceneFromBitmap));
 				System.out.println("SafeToJump: " + safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs));
 				System.out.println("MayMarioJump: " +  model.mayMarioJump());
-				System.out.println(model.getMarioScreenTilePos()[1]);
 
 				if (leftCounter > 8) {
 					facing_left = false;
@@ -328,7 +325,6 @@ public class Agent implements MarioAgent {
 				System.out.println("Gaps: " + dangerFromGaps(levelSceneFromBitmap));
 				System.out.println("SafeToJump: " + safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs));
 				System.out.println("MayMarioJump: " +  model.mayMarioJump());
-				System.out.println(model.getMarioScreenTilePos()[1]);
 
 				action[MarioActions.JUMP.getValue()] = true;
 				action[MarioActions.RIGHT.getValue()] = true;
@@ -348,6 +344,7 @@ public class Agent implements MarioAgent {
 						state = STATE.WALK_FORWARD;
 					}
 					else if(isShroom(completeObs) && dangerFromAbove(enemiesFromBitmap, model.getMarioScreenTilePos()[1])){
+						System.out.println(model.getMarioScreenTilePos()[1]);
 						enemyAbove = true;
 						state = STATE.JUMP_SHROOM;
 					}
@@ -394,7 +391,6 @@ public class Agent implements MarioAgent {
 //				 else if(enemyAbove){
 //				 	state = STATE.IDLE;
 //				 }
-
 
 				if(waitingForPowerUp){
 					if(isShroom(completeObs)){
@@ -471,6 +467,14 @@ public class Agent implements MarioAgent {
 
 			case JUMP_SHROOM:
 				System.out.println(state);
+				System.out.println(model.getMarioScreenTilePos()[1]);
+				System.out.println("DangerAbove: " + dangerFromAbove(enemiesFromBitmap, model.getMarioScreenTilePos()[1]));
+				System.out.println("Enemy: " + dangerFromEnemies(enemiesFromBitmap));
+				System.out.println("Block: " + block(levelSceneFromBitmap));
+				System.out.println("Gaps: " + dangerFromGaps(levelSceneFromBitmap));
+				System.out.println("SafeToJump: " + safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs));
+				System.out.println("MayMarioJump: " +  model.mayMarioJump());
+
 				action[MarioActions.RIGHT.getValue()] = false;
 				action[MarioActions.LEFT.getValue()] = false;
 				action[MarioActions.JUMP.getValue()] = true;
