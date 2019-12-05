@@ -62,6 +62,17 @@ public class Agent implements MarioAgent {
 		return false;
 	}
 
+	private boolean isShroom(int[][] levelSceneFromBitmap){
+		for (int x = 8; x <= 15; x++){
+			for(int y = 0; y <=15; y ++){
+				if(levelSceneFromBitmap[x][y] == 62){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private boolean solidBrick(int[][] levelSceneFromBitmap){
 		for (int x = 10; x <= 10; x++){
 			for(int y = 5; y <=6; y ++){
@@ -242,9 +253,16 @@ public class Agent implements MarioAgent {
 				// safe to. If there's danger of falling, jump no matter what
 				if ((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
 						&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs)) ||  levelSceneFromBitmap[model.getMarioScreenTilePos()[0]+1][9] == 0)
-						&& model.mayMarioJump()){
+						&& model.mayMarioJump()) {
 					action[MarioActions.SPEED.getValue()] = true;
 					state = STATE.JUMP;
+				}
+
+				else if(!dangerFromEnemies(enemiesFromBitmap) && !safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs) && isShroom(completeObs) == true){
+					jumpCount = 5;
+					action[MarioActions.RIGHT.getValue()] = true;
+					state = STATE.JUMP;
+					System.out.println("SHORT JUMP");
 				}
 
 				//if there is a brick directly above mario and there are no enemies then we want to jump
