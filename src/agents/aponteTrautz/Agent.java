@@ -154,15 +154,16 @@ public class Agent implements MarioAgent {
 
 	// determines if there is a gap close enough to pose a danger to you - implies
 	// you should jump
-	private int gapLocation(byte[][] levelSceneFromBitmap) {
-		for (int y = 9; y <= 10; y++) {
-			for (int x = 9; x <= 12; x++) {
+	private int gapLength(byte[][] levelSceneFromBitmap, int marioX, int marioY) {
+		int length = 0;
+		for (int y = marioY; y <= marioY; y++) {
+			for (int x = marioX+1; x <= marioX+6; x++) {
 				if (levelSceneFromBitmap[x][y] == 0) {
-					return x;
+					length ++;
 				}
 			}
 		}
-		return 0;
+		return length;
 	}
 
 	// determines if it's safe to jump
@@ -252,6 +253,22 @@ public class Agent implements MarioAgent {
 					System.out.println("IM A BRICK!!!");
 					state = STATE.JUMP;
 				}
+
+//				else if(!dangerFromEnemies(enemiesFromBitmap) && !safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs) && dangerFromGaps(levelSceneFromBitmap)){
+//					if(gapLength(levelSceneFromBitmap, model.getMarioScreenTilePos()[0], model.getMarioScreenTilePos()[1]) <=3){
+//						action[MarioActions.RIGHT.getValue()] = true;
+//						state = STATE.JUMP;
+//						System.out.println("SHORT JUMP");
+//						jumpCount = 8 - (gapLength(levelSceneFromBitmap, model.getMarioScreenTilePos()[0], model.getMarioScreenTilePos()[1]));
+//
+//					} else {
+//						jumpCount = 0;
+//						action[MarioActions.RIGHT.getValue()] = true;
+//						state = STATE.JUMP;
+//						System.out.println("SHORT JUMP");
+//					}
+//				}
+				
 				//if there is a enemy or obstacle, and we are unable to safely jump over it then move backwards.
 				else if((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap)) && (safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs) != model.mayMarioJump())) {
 					state = STATE.WALK_BACKWARD;
