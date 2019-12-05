@@ -260,7 +260,7 @@ public class Agent implements MarioAgent {
 					state = STATE.IDLE;
 				}
 
-				 if ((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
+				else if ((((dangerFromEnemies(enemiesFromBitmap) || block(levelSceneFromBitmap))
 						&& safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs)) ||  levelSceneFromBitmap[model.getMarioScreenTilePos()[0]+1][9] == 0)
 						&& model.mayMarioJump()) {
 					action[MarioActions.SPEED.getValue()] = true;
@@ -383,18 +383,17 @@ public class Agent implements MarioAgent {
 				System.out.println("SafeToJump: " + safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs));
 				System.out.println("MayMarioJump: " +  model.mayMarioJump());
 
-				 if(enemyAbove){
-					if(dangerFromAbove(enemiesFromBitmap, model.getMarioScreenTilePos()[1])){
-						System.out.println("STAYING IDLE");
-						state = STATE.IDLE;
-					} else {
-						enemyAbove = false;
-						state = STATE.JUMP;
-					}
+				if(dangerFromAbove(enemiesFromBitmap, model.getMarioScreenTilePos()[1])){
+					enemyAbove = true;
+					state = STATE.IDLE;
 				}
 
+				 else if(enemyAbove){
+				 	state = STATE.IDLE;
+				 }
+
 				//If there is an obstacle in front of you and no enemy, jump exactly the height of the obstacle. Used for stairs/pipes.
-				 else if((safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs) != model.mayMarioJump()) && block(levelSceneFromBitmap) && !dangerFromEnemies(enemiesFromBitmap) && !dangerFromGaps(levelSceneFromBitmap)){
+				  else if((safeToJump(levelSceneFromBitmap, enemiesFromBitmap, completeObs) != model.mayMarioJump()) && block(levelSceneFromBitmap) && !dangerFromEnemies(enemiesFromBitmap) && !dangerFromGaps(levelSceneFromBitmap)){
 					System.out.println("MayMarioJump: " +  obsHeight(levelSceneFromBitmap, model.getMarioScreenTilePos()[0]));
 					jumpCount = 8 - (1 + obsHeight(levelSceneFromBitmap, model.getMarioScreenTilePos()[0]));
 					action[MarioActions.RIGHT.getValue()] = true;
