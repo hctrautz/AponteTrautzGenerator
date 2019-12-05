@@ -141,7 +141,8 @@ public class Agent implements MarioAgent {
 	// implies you should jump
 	private boolean dangerFromAbove(byte[][] enemiesFromBitmap, int marioY) {
 		for (int y = marioY-1; y > 0 ; y--) {
-			for (int x = 8; x <= 9; x++) {
+			System.out.println(y);
+			for (int x = 6; x <= 15; x++) {
 				if (enemiesFromBitmap[x][y] == 1) {
 					return true;
 				}
@@ -238,6 +239,7 @@ public class Agent implements MarioAgent {
 		switch (state) {
 			case WALK_FORWARD:
 				System.out.println(state);
+				System.out.println("DangerAbove: " + dangerFromAbove(enemiesFromBitmap, model.getMarioScreenTilePos()[1]));
 				System.out.println("Enemy: " + dangerFromEnemies(enemiesFromBitmap));
 				System.out.println("Block: " + block(levelSceneFromBitmap));
 				System.out.println("Gaps: " + dangerFromGaps(levelSceneFromBitmap));
@@ -303,6 +305,7 @@ public class Agent implements MarioAgent {
 				leftCounter++;
 
 				System.out.println(state);
+				System.out.println("DangerAbove: " + dangerFromAbove(enemiesFromBitmap, model.getMarioScreenTilePos()[1]));
 				System.out.println("Enemy: " + dangerFromEnemies(enemiesFromBitmap));
 				System.out.println("Block: " + block(levelSceneFromBitmap));
 				System.out.println("Gaps: " + dangerFromGaps(levelSceneFromBitmap));
@@ -318,6 +321,7 @@ public class Agent implements MarioAgent {
 
 			case JUMP:
 				System.out.println(state);
+				System.out.println("DangerAbove: " + dangerFromAbove(enemiesFromBitmap, model.getMarioScreenTilePos()[1]));
 				System.out.println("Enemy: " + dangerFromEnemies(enemiesFromBitmap));
 				System.out.println("Block: " + block(levelSceneFromBitmap));
 				System.out.println("Gaps: " + dangerFromGaps(levelSceneFromBitmap));
@@ -366,7 +370,7 @@ public class Agent implements MarioAgent {
 				action[MarioActions.LEFT.getValue()] = false;
 				action[MarioActions.LEFT.getValue()] = false;
 				action[MarioActions.SPEED.getValue()] = false;
-
+				System.out.println("DangerAbove: " + dangerFromAbove(enemiesFromBitmap, model.getMarioScreenTilePos()[1]));
 				System.out.println("Enemy: " + dangerFromEnemies(enemiesFromBitmap));
 				System.out.println("Block: " + block(levelSceneFromBitmap));
 				System.out.println("Gaps: " + dangerFromGaps(levelSceneFromBitmap));
